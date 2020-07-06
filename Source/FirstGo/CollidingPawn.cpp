@@ -3,6 +3,8 @@
 #include "CollidingPawnMovementComponent.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Components/SphereComponent.h"
+#include "Components/SpotLightComponent.h"
+#include "Math/Color.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
@@ -22,13 +24,35 @@ ACollidingPawn::ACollidingPawn()
 	SphereVisual = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisualRepresentation"));
 	SphereVisual->SetupAttachment(RootComponent);
 
+	//setting up what the camera looks at
+	LookAt = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CameraLookAt"));
+	LookAt->SetupAttachment(RootComponent);
+	LookAt->SetRelativeLocation(FVector(100.0f, 0.0f, 0.0f));
+
+	//Giving the player a flash light, positioned slightly in front of the player
+	Light = CreateDefaultSubobject<USpotLightComponent>(TEXT("Torch"));
+	Light->SetupAttachment(RootComponent);
+	Light->SetRelativeLocation(FVector(26.0f, 0.0f, 0.0f));
+	Light->SetInnerConeAngle(10.0f);
+	Light->SetOuterConeAngle(45.0f);
+	Light->SetLightBrightness(5000.0f);
+
+	//Giving the player a coloured aiming light
+	Laser = CreateDefaultSubobject<USpotLightComponent>(TEXT("Laser"));
+	Laser->SetupAttachment(RootComponent);
+	Laser->SetRelativeLocation(FVector(26.0f, 0.0f, 0.0f));
+	Laser->SetInnerConeAngle(1.0f);
+	Laser->SetOuterConeAngle(0.0f);
+	Laser->SetLightColor(FLinearColor(0,1,0,1));
+
 	// Use a spring arm to give the camera smooth, natural-feeling motion.
 	USpringArmComponent* SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraAttachmentArm"));
-	SpringArm->SetupAttachment(RootComponent);
-	SpringArm->SetRelativeRotation(FRotator(-45.f, 0.f, 0.f));
-	SpringArm->TargetArmLength = 400.0f;
+	SpringArm->SetupAttachment(LookAt);
+	SpringArm->SetRelativeRotation(FRotator(-30.0f, 0.f, 0.0f));
+	SpringArm->TargetArmLength = 300.0f;
 	SpringArm->bEnableCameraLag = true;
 	SpringArm->CameraLagSpeed = 3.0f;
+	SpringArm->bDoCollisionTest=false;
 
 	// Create a camera and attach to our spring arm
 	UCameraComponent* Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("ActualCamera"));

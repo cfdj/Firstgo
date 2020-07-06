@@ -28,6 +28,10 @@ public:
 	UPROPERTY()
 		class UParticleSystemComponent* OurParticleSystem;
 	UPROPERTY(EditAnywhere) USceneComponent* SphereVisual;
+	UPROPERTY() USceneComponent* LookAt; //so the camera is looking slightly in front of the player
+
+	UPROPERTY() class USpotLightComponent* Light;
+	UPROPERTY() class USpotLightComponent* Laser;
 
 	UPROPERTY()
 		class UCollidingPawnMovementComponent* OurMovementComponent;
